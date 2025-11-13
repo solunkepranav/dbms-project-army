@@ -1,0 +1,2366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Armed Forces Management System</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #1e3a8a;
+      --primary-dark: #1e40af;
+      --secondary: #64748b;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --light: #f8fafc;
+      --dark: #0f172a;
+      --border: #e2e8f0;
+      --shadow: 0 1px 3px rgba(0,0,0,0.1);
+      --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      min-height: 100vh;
+      color: var(--dark);
+    }
+
+    /* Login Modal Styles */
+    .login-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .login-modal {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .login-modal h2 {
+      margin-bottom: 1.5rem;
+      color: var(--primary);
+      text-align: center;
+    }
+
+    .login-modal .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .login-modal label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--dark);
+    }
+
+    .login-modal input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.875rem;
+    }
+
+    .login-modal input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .login-modal button {
+      width: 100%;
+      padding: 0.75rem;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+
+    .login-modal button:hover {
+      background: var(--primary-dark);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Form Modal Styles */
+    .form-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      overflow-y: auto;
+      padding: 2rem;
+    }
+
+    .form-modal {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      width: 90%;
+      max-width: 800px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+      margin: auto;
+    }
+
+    .form-modal h2 {
+      margin-bottom: 1.5rem;
+      color: var(--primary);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 1rem;
+    }
+
+    .form-modal .form-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+      justify-content: flex-end;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .navbar {
+      background: white;
+      box-shadow: var(--shadow);
+      padding: 1rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .navbar-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .nav-link {
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 500;
+      text-decoration: none;
+      color: var(--secondary);
+      font-size: 0.875rem;
+    }
+
+    .nav-link:hover {
+      background: var(--light);
+      color: var(--primary);
+    }
+
+    .nav-link.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.5rem 1rem;
+      background: var(--light);
+      border-radius: 6px;
+      font-size: 0.875rem;
+    }
+
+    .user-info .role-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.75rem;
+    }
+
+    .user-info .role-badge.admin {
+      background: var(--danger);
+      color: white;
+    }
+
+    .user-info .role-badge.user {
+      background: var(--secondary);
+      color: white;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: var(--shadow-lg);
+      margin-bottom: 1.5rem;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .card-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--dark);
+    }
+
+    .btn {
+      padding: 0.625rem 1.25rem;
+      border-radius: 6px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.875rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: white;
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn-secondary {
+      background: var(--secondary);
+      color: white;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--dark);
+      font-size: 0.875rem;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.875rem;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      font-size: 0.875rem;
+      opacity: 0.9;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      font-size: 0.875rem;
+    }
+
+    .table th {
+      background: var(--light);
+      padding: 1rem;
+      text-align: left;
+      font-weight: 600;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .table td {
+      padding: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .table tr:hover {
+      background: var(--light);
+    }
+
+    .alert {
+      padding: 1rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+    }
+
+    .alert-success {
+      background: #d1fae5;
+      color: #065f46;
+      border-left: 4px solid var(--success);
+    }
+
+    .alert-error {
+      background: #fee2e2;
+      color: #991b1b;
+      border-left: 4px solid var(--danger);
+    }
+
+    .alert-info {
+      background: #dbeafe;
+      color: #1e40af;
+      border-left: 4px solid var(--primary);
+    }
+
+    .filters {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    .filters > * {
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: var(--secondary);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+
+    .badge-primary {
+      background: #dbeafe;
+      color: var(--primary);
+    }
+
+    .badge-success {
+      background: #d1fae5;
+      color: var(--success);
+    }
+
+    .badge-warning {
+      background: #fef3c7;
+      color: #d97706;
+    }
+
+    @media (max-width: 768px) {
+      .navbar-content {
+        flex-direction: column;
+      }
+      .card {
+        padding: 1.5rem;
+      }
+      .table {
+        font-size: 0.75rem;
+      }
+      .table th, .table td {
+        padding: 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Login/Register Overlay -->
+  <div id="loginOverlay" class="login-overlay">
+    <div class="login-modal">
+      <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 2px solid var(--border);">
+        <button id="showLoginBtn" class="btn btn-primary" style="flex: 1; border-radius: 0; border-bottom: 3px solid var(--primary);" onclick="showLoginForm()">Login</button>
+        <button id="showRegisterBtn" class="btn btn-secondary" style="flex: 1; border-radius: 0;" onclick="showRegisterForm()">Register</button>
+      </div>
+      
+      <!-- Login Form -->
+      <div id="loginFormContainer">
+        <h2>AFMS Login</h2>
+        <div id="loginError" class="alert alert-error hidden"></div>
+        <form id="loginForm">
+          <div class="form-group">
+            <label>Username</label>
+            <input type="text" name="username" required autocomplete="username">
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" name="password" required autocomplete="current-password">
+          </div>
+          <button type="submit">Login</button>
+        </form>
+      </div>
+
+      <!-- Register Form -->
+      <div id="registerFormContainer" class="hidden">
+        <h2>AFMS Registration</h2>
+        <div id="registerError" class="alert alert-error hidden"></div>
+        <div id="registerSuccess" class="alert alert-success hidden"></div>
+        <form id="registerForm">
+          <div class="form-group">
+            <label>Username (min 3 characters)</label>
+            <input type="text" name="username" required autocomplete="username" minlength="3">
+          </div>
+          <div class="form-group">
+            <label>Password (min 6 characters)</label>
+            <input type="password" name="password" required autocomplete="new-password" minlength="6">
+          </div>
+          <div class="form-group">
+            <label>Confirm Password</label>
+            <input type="password" name="confirmPassword" required autocomplete="new-password" minlength="6">
+          </div>
+          <button type="submit">Register</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Application -->
+  <div id="mainApp" class="hidden">
+  <nav class="navbar">
+    <div class="navbar-content">
+      <div class="brand">
+          <div class="brand-icon">AFMS</div>
+          <span>Armed Forces Management System</span>
+      </div>
+        <div class="nav-links">
+          <a class="nav-link active" onclick="navigateTo('dashboard')">Dashboard</a>
+          <a class="nav-link" onclick="navigateTo('serving')">Serving Personnel</a>
+          <a class="nav-link" onclick="navigateTo('retired')">Retired Personnel</a>
+          <a class="nav-link" onclick="navigateTo('logistics')">Logistics</a>
+          <a class="nav-link" onclick="navigateTo('artillery')">Artillery</a>
+          <a class="nav-link" onclick="navigateTo('ships')">Ships</a>
+          <a class="nav-link" onclick="navigateTo('jets')">Jets</a>
+          <a class="nav-link" onclick="navigateTo('reports')">Reports</a>
+          <a class="nav-link admin-only" onclick="navigateTo('users')" style="display: none;">User Management</a>
+          <div class="user-info">
+            <span id="userDisplay">User</span>
+            <span id="roleBadge" class="role-badge">user</span>
+            <button class="btn btn-danger" onclick="logout()" style="padding: 0.25rem 0.75rem; font-size: 0.75rem;">Logout</button>
+          </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+      <!-- Dashboard Page -->
+      <div id="page-dashboard" class="page active">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Dashboard</h2>
+          </div>
+          <div id="dashboardStats"></div>
+        </div>
+      </div>
+
+      <!-- Serving Personnel Page -->
+      <div id="page-serving" class="page">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Serving Personnel</h2>
+            <button class="btn btn-primary admin-only" onclick="showAddServingForm()">Add Personnel</button>
+        </div>
+          <div class="filters">
+            <input type="text" id="filterRank" placeholder="Filter by Rank">
+            <input type="text" id="filterRegiment" placeholder="Filter by Regiment">
+            <select id="filterPosting">
+              <option value="">All Postings</option>
+              <option value="F">Field</option>
+              <option value="H">Headquarters</option>
+              <option value="T">Training</option>
+            </select>
+            <button class="btn btn-primary" onclick="loadServingPersonnel()">Filter</button>
+        </div>
+          <div id="servingList"></div>
+        </div>
+      </div>
+
+      <!-- Retired Personnel Page -->
+      <div id="page-retired" class="page">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Retired Personnel</h2>
+            <button class="btn btn-primary admin-only" onclick="showAddRetiredForm()">Add Personnel</button>
+          </div>
+          <div id="retiredList"></div>
+      </div>
+    </div>
+
+      <!-- Logistics Page -->
+      <div id="page-logistics" class="page">
+        <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Logistics & Equipment</h2>
+            <button class="btn btn-primary admin-only" onclick="showAddLogisticsForm()">Add Equipment</button>
+        </div>
+          <div class="filters">
+            <select id="filterLogisticsType">
+              <option value="">All Types</option>
+              <option value="Artillery">Artillery</option>
+              <option value="Ships">Ships</option>
+              <option value="Jets">Jets</option>
+            </select>
+            <input type="text" id="filterLocation" placeholder="Filter by Location">
+            <button class="btn btn-primary" onclick="loadLogistics()">Filter</button>
+          </div>
+          <div id="logisticsList"></div>
+          </div>
+      </div>
+
+      <!-- Artillery Page -->
+      <div id="page-artillery" class="page">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Artillery Equipment</h2>
+            <button class="btn btn-primary admin-only" onclick="showAddArtilleryForm()">Add Artillery</button>
+          </div>
+          <div id="artilleryList"></div>
+      </div>
+    </div>
+
+      <!-- Ships Page -->
+      <div id="page-ships" class="page">
+        <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Naval Ships</h2>
+            <button class="btn btn-primary admin-only" onclick="showAddShipForm()">Add Ship</button>
+        </div>
+          <div id="shipsList"></div>
+        </div>
+      </div>
+
+      <!-- Jets Page -->
+      <div id="page-jets" class="page">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Aircraft (Jets)</h2>
+            <button class="btn btn-primary admin-only" onclick="showAddJetForm()">Add Jet</button>
+          </div>
+          <div id="jetsList"></div>
+        </div>
+      </div>
+
+      <!-- Reports Page -->
+      <div id="page-reports" class="page">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Personnel-Equipment Assignments</h2>
+          </div>
+          <div id="reportsList"></div>
+        </div>
+      </div>
+
+      <!-- User Management Page (Admin Only) -->
+      <div id="page-users" class="page">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">User Management</h2>
+          </div>
+          <div id="usersList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Modals -->
+  <!-- Serving Personnel Form Modal -->
+  <div id="servingFormModal" class="form-modal-overlay hidden">
+    <div class="form-modal">
+      <h2 id="servingFormTitle">Add Serving Personnel</h2>
+      <div id="servingFormError" class="alert alert-error hidden"></div>
+      <form id="servingForm">
+        <input type="hidden" id="servingFormId" name="serviceID">
+          <div class="form-row">
+            <div class="form-group">
+            <label>Service ID *</label>
+            <input type="text" id="servingServiceID" name="serviceID" required maxlength="8" pattern="[A-Z0-9]{8}">
+            </div>
+            <div class="form-group">
+            <label>First Name *</label>
+            <input type="text" id="servingFirstName" name="firstName" required>
+          </div>
+          <div class="form-group">
+            <label>Last Name *</label>
+            <input type="text" id="servingLastName" name="lastName" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+            <label>Date of Birth *</label>
+            <input type="date" id="servingDOB" name="DOB" required>
+          </div>
+          <div class="form-group">
+            <label>Current Rank *</label>
+            <select id="servingRank" name="currRank" required>
+              <option value="">Select Rank</option>
+              <option value="Capt">Capt</option>
+              <option value="Maj">Maj</option>
+              <option value="Lt Col">Lt Col</option>
+              <option value="Col">Col</option>
+              <option value="Brig">Brig</option>
+              <option value="Maj Gen">Maj Gen</option>
+              <option value="Lt Gen">Lt Gen</option>
+              </select>
+            </div>
+            <div class="form-group">
+            <label>Posting Type *</label>
+            <select id="servingPostingType" name="postingType" required>
+              <option value="">Select</option>
+              <option value="F">Field</option>
+              <option value="H">Headquarters</option>
+              <option value="T">Training</option>
+            </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+            <label>Regiment</label>
+            <input type="text" id="servingRegiment" name="regiment">
+            </div>
+            <div class="form-group">
+            <label>Salary *</label>
+            <input type="number" id="servingSalary" name="salary" required min="1">
+            </div>
+          </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Awards</label>
+            <input type="text" id="servingAwards" name="awards">
+      </div>
+          <div class="form-group">
+            <label>Skills</label>
+            <input type="text" id="servingSkills" name="skills">
+    </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Medical</label>
+            <input type="text" id="servingMedical" name="medical">
+        </div>
+          <div class="form-group">
+            <label>Health Plan</label>
+            <input type="text" id="servingHealthPlan" name="healthPlan">
+        </div>
+      </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeServingForm()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+      </form>
+    </div>
+        </div>
+        
+  <!-- Retired Personnel Form Modal -->
+  <div id="retiredFormModal" class="form-modal-overlay hidden">
+    <div class="form-modal">
+      <h2 id="retiredFormTitle">Add Retired Personnel</h2>
+      <div id="retiredFormError" class="alert alert-error hidden"></div>
+      <form id="retiredForm">
+        <input type="hidden" id="retiredFormId" name="serviceID">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Service ID *</label>
+            <input type="text" id="retiredServiceID" name="serviceID" required maxlength="8">
+          </div>
+          <div class="form-group">
+            <label>First Name *</label>
+            <input type="text" id="retiredFirstName" name="firstName" required>
+          </div>
+          <div class="form-group">
+            <label>Last Name *</label>
+            <input type="text" id="retiredLastName" name="lastName" required>
+          </div>
+          </div>
+            <div class="form-row">
+              <div class="form-group">
+            <label>Date of Birth *</label>
+            <input type="date" id="retiredDOB" name="DOB" required>
+              </div>
+              <div class="form-group">
+            <label>Last Rank *</label>
+            <select id="retiredRank" name="lastRank" required>
+              <option value="">Select Rank</option>
+              <option value="Capt">Capt</option>
+              <option value="Maj">Maj</option>
+              <option value="Lt Col">Lt Col</option>
+              <option value="Col">Col</option>
+              <option value="Brig">Brig</option>
+              <option value="Maj Gen">Maj Gen</option>
+              <option value="Lt Gen">Lt Gen</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Retirement Date *</label>
+            <input type="date" id="retiredRetirementDate" name="retirementDate" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+            <label>Regiment</label>
+            <input type="text" id="retiredRegiment" name="regiment">
+              </div>
+              <div class="form-group">
+            <label>Pension *</label>
+            <input type="number" id="retiredPension" name="pension" required min="1">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+            <label>Awards</label>
+            <input type="text" id="retiredAwards" name="awards">
+              </div>
+              <div class="form-group">
+            <label>Skills</label>
+            <input type="text" id="retiredSkills" name="skills">
+              </div>
+            </div>
+            <div class="form-group">
+          <label>Health Plan</label>
+          <input type="text" id="retiredHealthPlan" name="healthPlan">
+            </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeRetiredForm()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+          </div>
+
+  <!-- Logistics Form Modal -->
+  <div id="logisticsFormModal" class="form-modal-overlay hidden">
+    <div class="form-modal">
+      <h2 id="logisticsFormTitle">Add Equipment</h2>
+      <div id="logisticsFormError" class="alert alert-error hidden"></div>
+      <form id="logisticsForm">
+        <input type="hidden" id="logisticsFormId" name="equipmentID">
+            <div class="form-row">
+              <div class="form-group">
+            <label>Equipment ID *</label>
+            <input type="text" id="logisticsEquipmentID" name="equipmentID" required maxlength="12">
+              </div>
+              <div class="form-group">
+            <label>Type *</label>
+            <select id="logisticsType" name="logisticsType" required>
+              <option value="">Select Type</option>
+              <option value="Artillery">Artillery</option>
+              <option value="Ships">Ships</option>
+              <option value="Jets">Jets</option>
+            </select>
+              </div>
+            </div>
+        <div class="form-row">
+            <div class="form-group">
+            <label>Cost *</label>
+            <input type="number" id="logisticsCost" name="cost" required min="1">
+            </div>
+          <div class="form-group">
+            <label>Procurement Date *</label>
+            <input type="date" id="logisticsProcurementDate" name="procurementDate" required>
+            </div>
+          </div>
+            <div class="form-row">
+              <div class="form-group">
+            <label>Location *</label>
+            <input type="text" id="logisticsLocation" name="location" required>
+              </div>
+              <div class="form-group">
+            <label>Assigned To (Service ID)</label>
+            <input type="text" id="logisticsAssignedTo" name="assignedTo" maxlength="8">
+              </div>
+            </div>
+        <div class="form-group">
+          <label>Technology Level</label>
+          <input type="text" id="logisticsTech" name="tech">
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeLogisticsForm()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+            </div>
+          </div>
+
+  <!-- Artillery Form Modal -->
+  <div id="artilleryFormModal" class="form-modal-overlay hidden">
+    <div class="form-modal">
+      <h2 id="artilleryFormTitle">Add Artillery</h2>
+      <div id="artilleryFormError" class="alert alert-error hidden"></div>
+      <form id="artilleryForm">
+        <input type="hidden" id="artilleryFormId" name="equipmentID">
+        <div class="form-row">
+            <div class="form-group">
+            <label>Equipment ID * (Must exist in Logistics)</label>
+            <input type="text" id="artilleryEquipmentID" name="equipmentID" required maxlength="12">
+            </div>
+          <div class="form-group">
+            <label>Type *</label>
+            <input type="text" id="artilleryType" name="type" required placeholder="e.g., Howitzer, Rocket Launcher">
+            </div>
+          </div>
+        <div class="form-row">
+            <div class="form-group">
+            <label>Range (km) *</label>
+            <input type="number" id="artilleryRange" name="artRange" required step="0.01" min="0">
+            </div>
+            <div class="form-group">
+            <label>Commissioning Date *</label>
+            <input type="date" id="artilleryCommissioningDate" name="commissioningDate" required>
+            </div>
+            </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeArtilleryForm()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  <!-- Ships Form Modal -->
+  <div id="shipsFormModal" class="form-modal-overlay hidden">
+    <div class="form-modal">
+      <h2 id="shipsFormTitle">Add Ship</h2>
+      <div id="shipsFormError" class="alert alert-error hidden"></div>
+      <form id="shipsForm">
+        <input type="hidden" id="shipsFormId" name="equipmentID">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Equipment ID * (Must exist in Logistics)</label>
+            <input type="text" id="shipsEquipmentID" name="equipmentID" required maxlength="12">
+        </div>
+          <div class="form-group">
+            <label>Ship Name *</label>
+            <input type="text" id="shipsName" name="shipName" required>
+      </div>
+    </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Ship Type *</label>
+            <input type="text" id="shipsType" name="shipType" required placeholder="e.g., Aircraft Carrier, Destroyer">
+        </div>
+          <div class="form-group">
+            <label>Staff Size *</label>
+            <input type="number" id="shipsStaffSize" name="staffSize" required min="1">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Commissioning Date *</label>
+          <input type="date" id="shipsCommissioningDate" name="commissioningDate" required>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeShipsForm()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+      </div>
+    </div>
+
+  <!-- Jets Form Modal -->
+  <div id="jetsFormModal" class="form-modal-overlay hidden">
+    <div class="form-modal">
+      <h2 id="jetsFormTitle">Add Jet</h2>
+      <div id="jetsFormError" class="alert alert-error hidden"></div>
+      <form id="jetsForm">
+        <input type="hidden" id="jetsFormId" name="equipmentID">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Equipment ID * (Must exist in Logistics)</label>
+            <input type="text" id="jetsEquipmentID" name="equipmentID" required maxlength="12">
+        </div>
+          <div class="form-group">
+            <label>Jet Name *</label>
+            <input type="text" id="jetsName" name="jetName" required>
+      </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Jet Type *</label>
+            <input type="text" id="jetsType" name="jetType" required placeholder="e.g., Fighter, Bomber">
+      </div>
+          <div class="form-group">
+            <label>Speed (km/h) *</label>
+            <input type="number" id="jetsSpeed" name="speed" required step="0.01" min="0">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Commissioning Date *</label>
+          <input type="date" id="jetsCommissioningDate" name="commissioningDate" required>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeJetsForm()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Authentication State
+    let authToken = localStorage.getItem('authToken');
+    let userRole = localStorage.getItem('userRole');
+    let username = localStorage.getItem('username');
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!authToken) {
+        showLogin();
+      } else {
+        showApp();
+        updateUI();
+      }
+    });
+
+    // Show Login Form
+    function showLoginForm() {
+      document.getElementById('loginFormContainer').classList.remove('hidden');
+      document.getElementById('registerFormContainer').classList.add('hidden');
+      document.getElementById('showLoginBtn').classList.remove('btn-secondary');
+      document.getElementById('showLoginBtn').classList.add('btn-primary');
+      document.getElementById('showRegisterBtn').classList.remove('btn-primary');
+      document.getElementById('showRegisterBtn').classList.add('btn-secondary');
+      document.getElementById('loginError').classList.add('hidden');
+      document.getElementById('registerError').classList.add('hidden');
+      document.getElementById('registerSuccess').classList.add('hidden');
+    }
+
+    // Show Register Form
+    function showRegisterForm() {
+      document.getElementById('loginFormContainer').classList.add('hidden');
+      document.getElementById('registerFormContainer').classList.remove('hidden');
+      document.getElementById('showLoginBtn').classList.remove('btn-primary');
+      document.getElementById('showLoginBtn').classList.add('btn-secondary');
+      document.getElementById('showRegisterBtn').classList.remove('btn-secondary');
+      document.getElementById('showRegisterBtn').classList.add('btn-primary');
+      document.getElementById('loginError').classList.add('hidden');
+      document.getElementById('registerError').classList.add('hidden');
+      document.getElementById('registerSuccess').classList.add('hidden');
+    }
+
+    // Register Form Handler
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const password = formData.get('password');
+      const confirmPassword = formData.get('confirmPassword');
+
+      const errorEl = document.getElementById('registerError');
+      const successEl = document.getElementById('registerSuccess');
+      errorEl.classList.add('hidden');
+      successEl.classList.add('hidden');
+
+      if (password !== confirmPassword) {
+        errorEl.textContent = 'Passwords do not match';
+        errorEl.classList.remove('hidden');
+        return;
+      }
+
+      const data = {
+        username: formData.get('username'),
+        password: password
+      };
+
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+        
+        if (!res.ok) {
+          errorEl.textContent = result.error || 'Registration failed';
+          errorEl.classList.remove('hidden');
+          return;
+        }
+
+        successEl.textContent = result.message || 'Registration successful! Please login.';
+        successEl.classList.remove('hidden');
+          e.target.reset();
+        
+        // Switch to login form after 2 seconds
+        setTimeout(() => {
+          showLoginForm();
+        }, 2000);
+      } catch (err) {
+        errorEl.textContent = 'Network error. Please try again.';
+        errorEl.classList.remove('hidden');
+      }
+    });
+
+    // Login Form Handler
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = {
+        username: formData.get('username'),
+        password: formData.get('password')
+      };
+
+      const errorEl = document.getElementById('loginError');
+      errorEl.classList.add('hidden');
+      errorEl.textContent = '';
+
+      try {
+        const res = await fetch('/api/auth/login', {
+        method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+
+        if (!res.ok) {
+          errorEl.textContent = result.error || 'Login failed';
+          errorEl.classList.remove('hidden');
+          return;
+        }
+
+        // Save token and user info
+        authToken = result.token;
+        userRole = result.role;
+        username = result.username;
+
+        localStorage.setItem('authToken', authToken);
+        localStorage.setItem('userRole', userRole);
+        localStorage.setItem('username', username);
+
+        showApp();
+        updateUI();
+        loadDashboard();
+      } catch (err) {
+        errorEl.textContent = 'Network error. Please try again.';
+        errorEl.classList.remove('hidden');
+      }
+    });
+
+    // Logout
+    function logout() {
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('username');
+      authToken = null;
+      userRole = null;
+      username = null;
+      showLogin();
+    }
+
+    // Show/Hide UI
+    function showLogin() {
+      document.getElementById('loginOverlay').classList.remove('hidden');
+      document.getElementById('mainApp').classList.add('hidden');
+    }
+
+    function showApp() {
+      document.getElementById('loginOverlay').classList.add('hidden');
+      document.getElementById('mainApp').classList.remove('hidden');
+    }
+
+    // Update UI based on role
+    function updateUI() {
+      document.getElementById('userDisplay').textContent = username || 'User';
+      const roleBadge = document.getElementById('roleBadge');
+      roleBadge.textContent = userRole;
+      roleBadge.className = 'role-badge ' + userRole;
+
+      // Show/hide admin buttons and links
+      const adminElements = document.querySelectorAll('.admin-only');
+      adminElements.forEach(el => {
+        if (el.tagName === 'BUTTON') {
+          el.style.display = userRole === 'admin' ? 'inline-flex' : 'none';
+        } else {
+          el.style.display = userRole === 'admin' ? 'block' : 'none';
+        }
+      });
+    }
+
+    // API Helper with Auth
+    async function apiCall(url, options = {}) {
+      const headers = {
+        'Content-Type': 'application/json',
+        ...options.headers
+      };
+
+      if (authToken) {
+        headers['Authorization'] = `Bearer ${authToken}`;
+      }
+
+      const res = await fetch(url, {
+        ...options,
+        headers
+      });
+
+      // Handle auth errors
+      if (res.status === 401 || res.status === 403) {
+        logout();
+        alert('Session expired. Please login again.');
+        return null;
+      }
+
+      return res;
+    }
+
+    // Navigation
+    function navigateTo(page) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      
+      const pageEl = document.getElementById('page-' + page);
+      if (pageEl) {
+        pageEl.classList.add('active');
+        if (event && event.target) {
+          event.target.classList.add('active');
+        }
+        
+        // Load data for specific pages
+        if (page === 'dashboard') loadDashboard();
+        if (page === 'serving') loadServingPersonnel();
+        if (page === 'retired') loadRetiredPersonnel();
+        if (page === 'logistics') loadLogistics();
+        if (page === 'artillery') loadArtillery();
+        if (page === 'ships') loadShips();
+        if (page === 'jets') loadJets();
+        if (page === 'reports') loadReports();
+        if (page === 'users') loadUsers();
+      }
+    }
+
+    // Load Dashboard
+    async function loadDashboard() {
+      const statsEl = document.getElementById('dashboardStats');
+      try {
+        const res = await apiCall('/api/stats');
+        if (!res) return;
+        
+        const stats = await res.json();
+        statsEl.innerHTML = `
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-value">${stats.total_serving}</div>
+              <div class="stat-label">Serving Personnel</div>
+          </div>
+            <div class="stat-card" style="background:linear-gradient(135deg, #10b981, #059669)">
+              <div class="stat-value">${stats.total_retired}</div>
+              <div class="stat-label">Retired Personnel</div>
+            </div>
+            <div class="stat-card" style="background:linear-gradient(135deg, #f59e0b, #d97706)">
+              <div class="stat-value">${stats.total_equipment}</div>
+              <div class="stat-label">Total Equipment</div>
+            </div>
+            <div class="stat-card" style="background:linear-gradient(135deg, #ef4444, #dc2626)">
+              <div class="stat-value">${stats.total_artillery}</div>
+              <div class="stat-label">Artillery Units</div>
+            </div>
+            <div class="stat-card" style="background:linear-gradient(135deg, #8b5cf6, #7c3aed)">
+              <div class="stat-value">${stats.total_ships}</div>
+              <div class="stat-label">Naval Ships</div>
+          </div>
+            <div class="stat-card" style="background:linear-gradient(135deg, #06b6d4, #0891b2)">
+              <div class="stat-value">${stats.total_jets}</div>
+              <div class="stat-label">Aircraft</div>
+            </div>
+          </div>
+        `;
+      } catch (err) {
+        statsEl.innerHTML = '<div class="alert alert-error">Failed to load statistics.</div>';
+      }
+    }
+
+    // Load Serving Personnel
+    async function loadServingPersonnel() {
+      const listEl = document.getElementById('servingList');
+      listEl.innerHTML = '<div class="loading">Loading serving personnel...</div>';
+      
+      const params = new URLSearchParams();
+      const rank = document.getElementById('filterRank')?.value;
+      const regiment = document.getElementById('filterRegiment')?.value;
+      const posting = document.getElementById('filterPosting')?.value;
+
+      if (rank) params.set('rank', rank);
+      if (regiment) params.set('regiment', regiment);
+      if (posting) params.set('postingType', posting);
+
+      try {
+        const res = await apiCall('/api/personnel/serving?' + params.toString());
+        if (!res) return;
+        
+        const result = await res.json();
+
+        if (!result.personnel || result.personnel.length === 0) {
+          listEl.innerHTML = '<div class="alert alert-info">No serving personnel found.</div>';
+        return;
+      }
+
+        listEl.innerHTML = `
+          <div style="overflow-x:auto;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Service ID</th>
+                  <th>Name</th>
+                  <th>DOB</th>
+                  <th>Rank</th>
+                  <th>Regiment</th>
+                  <th>Salary</th>
+                  <th>Posting</th>
+                  <th>Awards</th>
+                  ${userRole === 'admin' ? '<th>Actions</th>' : ''}
+                </tr>
+              </thead>
+              <tbody>
+                ${result.personnel.map(p => `
+                  <tr>
+                    <td>${escapeHTML(p.serviceID)}</td>
+                    <td>${escapeHTML(p.firstName)} ${escapeHTML(p.lastName)}</td>
+                    <td>${new Date(p.DOB).toLocaleDateString()}</td>
+                    <td><span class="badge badge-primary">${escapeHTML(p.currRank)}</span></td>
+                    <td>${escapeHTML(p.regiment || 'N/A')}</td>
+                    <td>₹${p.salary.toLocaleString()}</td>
+                    <td>${p.postingType === 'F' ? 'Field' : p.postingType === 'H' ? 'HQ' : 'Training'}</td>
+                    <td>${escapeHTML(p.awards || 'None')}</td>
+                    ${userRole === 'admin' ? `
+                    <td>
+                      <div class="action-buttons">
+                        <button class="btn btn-primary" onclick="editServingPersonnel('${escapeHTML(p.serviceID)}')" style="padding: 0.5rem 1rem; font-size: 0.75rem;">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteServingPersonnel('${escapeHTML(p.serviceID)}')" style="padding: 0.5rem 1rem; font-size: 0.75rem;">Delete</button>
+                      </div>
+                    </td>
+                    ` : ''}
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      } catch (err) {
+        listEl.innerHTML = '<div class="alert alert-error">Failed to load serving personnel.</div>';
+      }
+    }
+
+    // Load Retired Personnel
+    async function loadRetiredPersonnel() {
+      const listEl = document.getElementById('retiredList');
+      listEl.innerHTML = '<div class="loading">Loading retired personnel...</div>';
+      
+      try {
+        const res = await apiCall('/api/personnel/retired');
+        if (!res) return;
+        
+        const result = await res.json();
+        
+        if (!result.personnel || result.personnel.length === 0) {
+          listEl.innerHTML = '<div class="alert alert-info">No retired personnel found.</div>';
+          return;
+        }
+
+        listEl.innerHTML = `
+          <div style="overflow-x:auto;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Service ID</th>
+                  <th>Name</th>
+                  <th>DOB</th>
+                  <th>Last Rank</th>
+                  <th>Regiment</th>
+                  <th>Retirement Date</th>
+                  <th>Pension</th>
+                  <th>Awards</th>
+                  ${userRole === 'admin' ? '<th>Actions</th>' : ''}
+                </tr>
+              </thead>
+              <tbody>
+                ${result.personnel.map(p => `
+                  <tr>
+                    <td>${escapeHTML(p.serviceID)}</td>
+                    <td>${escapeHTML(p.firstName)} ${escapeHTML(p.lastName)}</td>
+                    <td>${new Date(p.DOB).toLocaleDateString()}</td>
+                    <td><span class="badge badge-primary">${escapeHTML(p.lastRank)}</span></td>
+                    <td>${escapeHTML(p.regiment || 'N/A')}</td>
+                    <td>${new Date(p.retirementDate).toLocaleDateString()}</td>
+                    <td>₹${p.pension.toLocaleString()}</td>
+                    <td>${escapeHTML(p.awards || 'None')}</td>
+                    ${userRole === 'admin' ? `
+                    <td>
+                      <div class="action-buttons">
+                        <button class="btn btn-primary" onclick="editRetiredPersonnel('${escapeHTML(p.serviceID)}')" style="padding: 0.5rem 1rem; font-size: 0.75rem;">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteRetiredPersonnel('${escapeHTML(p.serviceID)}')" style="padding: 0.5rem 1rem; font-size: 0.75rem;">Delete</button>
+                      </div>
+                    </td>
+                    ` : ''}
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      } catch (err) {
+        listEl.innerHTML = '<div class="alert alert-error">Failed to load retired personnel.</div>';
+      }
+    }
+
+    // Load Logistics
+    async function loadLogistics() {
+      const listEl = document.getElementById('logisticsList');
+      listEl.innerHTML = '<div class="loading">Loading logistics...</div>';
+      
+      const params = new URLSearchParams();
+      const type = document.getElementById('filterLogisticsType')?.value;
+      const location = document.getElementById('filterLocation')?.value;
+
+      if (type) params.set('type', type);
+      if (location) params.set('location', location);
+
+      try {
+        const res = await apiCall('/api/logistics?' + params.toString());
+        if (!res) return;
+        
+        const result = await res.json();
+
+        if (!result.equipment || result.equipment.length === 0) {
+          listEl.innerHTML = '<div class="alert alert-info">No equipment found.</div>';
+          return;
+        }
+
+        listEl.innerHTML = `
+          <div style="overflow-x:auto;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Equipment ID</th>
+                  <th>Type</th>
+                  <th>Cost</th>
+                  <th>Procurement Date</th>
+                  <th>Location</th>
+                  <th>Assigned To</th>
+                  <th>Tech</th>
+                  ${userRole === 'admin' ? '<th>Actions</th>' : ''}
+                </tr>
+              </thead>
+              <tbody>
+                ${result.equipment.map(e => `
+                  <tr>
+                    <td>${escapeHTML(e.equipmentID)}</td>
+                    <td><span class="badge badge-success">${escapeHTML(e.logisticsType)}</span></td>
+                    <td>₹${e.cost.toLocaleString()}</td>
+                    <td>${new Date(e.procurementDate).toLocaleDateString()}</td>
+                    <td>${escapeHTML(e.location)}</td>
+                    <td>${escapeHTML(e.assignedTo || 'Unassigned')}</td>
+                    <td>${escapeHTML(e.tech || 'N/A')}</td>
+                    ${userRole === 'admin' ? `
+                    <td>
+                      <div class="action-buttons">
+                        <button class="btn btn-primary" onclick="editLogistics('${escapeHTML(e.equipmentID)}')" style="padding: 0.5rem 1rem; font-size: 0.75rem;">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteLogistics('${escapeHTML(e.equipmentID)}')" style="padding: 0.5rem 1rem; font-size: 0.75rem;">Delete</button>
+                      </div>
+                    </td>
+                    ` : ''}
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      } catch (err) {
+        listEl.innerHTML = '<div class="alert alert-error">Failed to load logistics.</div>';
+      }
+    }
+
+    // Load Artillery
+    async function loadArtillery() {
+      const listEl = document.getElementById('artilleryList');
+      listEl.innerHTML = '<div class="loading">Loading artillery...</div>';
+      
+      try {
+        const res = await apiCall('/api/artillery');
+        if (!res) return;
+        
+        const result = await res.json();
+
+        if (!result.artillery || result.artillery.length === 0) {
+          listEl.innerHTML = '<div class="alert alert-info">No artillery found.</div>';
+          return;
+        }
+
+        listEl.innerHTML = `
+          <div style="overflow-x:auto;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Equipment ID</th>
+                  <th>Type</th>
+                  <th>Range (km)</th>
+                  <th>Commissioning Date</th>
+                  <th>Location</th>
+                  <th>Cost</th>
+                  ${userRole === 'admin' ? '<th>Actions</th>' : ''}
+                </tr>
+              </thead>
+              <tbody>
+                ${result.artillery.map(a => `
+                  <tr>
+                    <td>${escapeHTML(a.equipmentID)}</td>
+                    <td><span class="badge badge-danger">${escapeHTML(a.type)}</span></td>
+                    <td>${a.artRange}</td>
+                    <td>${new Date(a.commissioningDate).toLocaleDateString()}</td>
+                    <td>${escapeHTML(a.location)}</td>
+                    <td>₹${a.cost.toLocaleString()}</td>
+                    ${userRole === 'admin' ? `
+                    <td>
+                      <div class="action-buttons">
+                        <button class="btn btn-primary" onclick="editArtillery('${escapeHTML(a.equipmentID)}')" style="padding: 0.5rem 1rem; font-size: 0.75rem;">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteArtillery('${escapeHTML(a.equipmentID)}')" style="padding: 0.5rem 1rem; font-size: 0.75rem;">Delete</button>
+                      </div>
+                    </td>
+                    ` : ''}
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      } catch (err) {
+        listEl.innerHTML = '<div class="alert alert-error">Failed to load artillery.</div>';
+      }
+    }
+
+    // Load Ships
+    async function loadShips() {
+      const listEl = document.getElementById('shipsList');
+      listEl.innerHTML = '<div class="loading">Loading ships...</div>';
+      
+      try {
+        const res = await apiCall('/api/ships');
+        if (!res) return;
+        
+        const result = await res.json();
+
+        if (!result.ships || result.ships.length === 0) {
+          listEl.innerHTML = '<div class="alert alert-info">No ships found.</div>';
+        return;
+      }
+
+        listEl.innerHTML = `
+          <div style="overflow-x:auto;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Equipment ID</th>
+                  <th>Ship Name</th>
+                  <th>Type</th>
+                  <th>Staff Size</th>
+                  <th>Commissioning Date</th>
+                  <th>Location</th>
+                  <th>Cost</th>
+                  ${userRole === 'admin' ? '<th>Actions</th>' : ''}
+                </tr>
+              </thead>
+              <tbody>
+                ${result.ships.map(s => `
+                  <tr>
+                    <td>${escapeHTML(s.equipmentID)}</td>
+                    <td><strong>${escapeHTML(s.shipName)}</strong></td>
+                    <td><span class="badge badge-primary">${escapeHTML(s.shipType)}</span></td>
+                    <td>${s.staffSize}</td>
+                    <td>${new Date(s.commissioningDate).toLocaleDateString()}</td>
+                    <td>${escapeHTML(s.location)}</td>
+                    <td>₹${s.cost.toLocaleString()}</td>
+                    ${userRole === 'admin' ? `
+                    <td>
+                      <div class="action-buttons">
+                        <button class="btn btn-primary" onclick="editShip('${escapeHTML(s.equipmentID)}')" style="padding: 0.5rem 1rem; font-size: 0.75rem;">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteShip('${escapeHTML(s.equipmentID)}')" style="padding: 0.5rem 1rem; font-size: 0.75rem;">Delete</button>
+        </div>
+                    </td>
+                    ` : ''}
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+        </div>
+      `;
+      } catch (err) {
+        listEl.innerHTML = '<div class="alert alert-error">Failed to load ships.</div>';
+      }
+    }
+
+    // Load Jets
+    async function loadJets() {
+      const listEl = document.getElementById('jetsList');
+      listEl.innerHTML = '<div class="loading">Loading jets...</div>';
+      
+      try {
+        const res = await apiCall('/api/jets');
+        if (!res) return;
+        
+        const result = await res.json();
+
+        if (!result.jets || result.jets.length === 0) {
+          listEl.innerHTML = '<div class="alert alert-info">No jets found.</div>';
+        return;
+        }
+
+        listEl.innerHTML = `
+          <div style="overflow-x:auto;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Equipment ID</th>
+                  <th>Jet Name</th>
+                  <th>Type</th>
+                  <th>Speed (km/h)</th>
+                  <th>Commissioning Date</th>
+                  <th>Location</th>
+                  <th>Cost</th>
+                  ${userRole === 'admin' ? '<th>Actions</th>' : ''}
+                </tr>
+              </thead>
+              <tbody>
+                ${result.jets.map(j => `
+                  <tr>
+                    <td>${escapeHTML(j.equipmentID)}</td>
+                    <td><strong>${escapeHTML(j.jetName)}</strong></td>
+                    <td><span class="badge badge-warning">${escapeHTML(j.jetType)}</span></td>
+                    <td>${j.speed.toLocaleString()}</td>
+                    <td>${new Date(j.commissioningDate).toLocaleDateString()}</td>
+                    <td>${escapeHTML(j.location)}</td>
+                    <td>₹${j.cost.toLocaleString()}</td>
+                    ${userRole === 'admin' ? `
+                    <td>
+                      <div class="action-buttons">
+                        <button class="btn btn-primary" onclick="editJet('${escapeHTML(j.equipmentID)}')" style="padding: 0.5rem 1rem; font-size: 0.75rem;">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteJet('${escapeHTML(j.equipmentID)}')" style="padding: 0.5rem 1rem; font-size: 0.75rem;">Delete</button>
+            </div>
+                    </td>
+                    ` : ''}
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      } catch (err) {
+        listEl.innerHTML = '<div class="alert alert-error">Failed to load jets.</div>';
+      }
+    }
+
+    // Load Reports
+    async function loadReports() {
+      const listEl = document.getElementById('reportsList');
+      listEl.innerHTML = '<div class="loading">Loading reports...</div>';
+      
+      try {
+        const res = await apiCall('/api/reports/personnel-equipment');
+        if (!res) return;
+        
+        const result = await res.json();
+
+        if (!result.assignments || result.assignments.length === 0) {
+          listEl.innerHTML = '<div class="alert alert-info">No assignments found.</div>';
+          return;
+        }
+
+        listEl.innerHTML = `
+          <div style="overflow-x:auto;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Service ID</th>
+                  <th>Name</th>
+                  <th>Rank</th>
+                  <th>Regiment</th>
+                  <th>Equipment ID</th>
+                  <th>Equipment Type</th>
+                  <th>Location</th>
+                  <th>Cost</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${result.assignments.map(a => `
+                  <tr>
+                    <td>${escapeHTML(a.serviceID)}</td>
+                    <td>${escapeHTML(a.firstName)} ${escapeHTML(a.lastName)}</td>
+                    <td><span class="badge badge-primary">${escapeHTML(a.currRank)}</span></td>
+                    <td>${escapeHTML(a.regiment || 'N/A')}</td>
+                    <td>${a.equipmentID ? escapeHTML(a.equipmentID) : '<em>None</em>'}</td>
+                    <td>${a.logisticsType ? `<span class="badge badge-success">${escapeHTML(a.logisticsType)}</span>` : '<em>None</em>'}</td>
+                    <td>${a.location ? escapeHTML(a.location) : '<em>N/A</em>'}</td>
+                    <td>${a.cost ? '₹' + a.cost.toLocaleString() : '<em>N/A</em>'}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      } catch (err) {
+        listEl.innerHTML = '<div class="alert alert-error">Failed to load reports.</div>';
+      }
+    }
+
+    // Form functions - Serving Personnel
+    function showAddServingForm() {
+      document.getElementById('servingFormTitle').textContent = 'Add Serving Personnel';
+      document.getElementById('servingForm').reset();
+      document.getElementById('servingServiceID').disabled = false;
+      document.getElementById('servingFormId').value = '';
+      document.getElementById('servingFormError').classList.add('hidden');
+      document.getElementById('servingFormModal').classList.remove('hidden');
+    }
+
+    function editServingPersonnel(id) {
+      // Fetch personnel data and populate form
+      apiCall(`/api/personnel/serving/${id}`).then(res => {
+        if (!res) return;
+        res.json().then(result => {
+          const p = result.personnel;
+          document.getElementById('servingFormTitle').textContent = 'Edit Serving Personnel';
+          document.getElementById('servingFormId').value = p.serviceID;
+          document.getElementById('servingServiceID').value = p.serviceID;
+          document.getElementById('servingServiceID').disabled = true;
+          document.getElementById('servingFirstName').value = p.firstName;
+          document.getElementById('servingLastName').value = p.lastName;
+          document.getElementById('servingDOB').value = p.DOB;
+          document.getElementById('servingRank').value = p.currRank;
+          document.getElementById('servingPostingType').value = p.postingType;
+          document.getElementById('servingRegiment').value = p.regiment || '';
+          document.getElementById('servingSalary').value = p.salary;
+          document.getElementById('servingAwards').value = p.awards || '';
+          document.getElementById('servingSkills').value = p.skills || '';
+          document.getElementById('servingMedical').value = p.medical || '';
+          document.getElementById('servingHealthPlan').value = p.healthPlan || '';
+          document.getElementById('servingFormError').classList.add('hidden');
+          document.getElementById('servingFormModal').classList.remove('hidden');
+        });
+      });
+    }
+
+    function closeServingForm() {
+      document.getElementById('servingFormModal').classList.add('hidden');
+    }
+
+    async function deleteServingPersonnel(id) {
+      if (!confirm(`Are you sure you want to delete serving personnel ${id}?`)) return;
+      try {
+        const res = await apiCall(`/api/personnel/serving/${id}`, { method: 'DELETE' });
+        if (!res) return;
+        const result = await res.json();
+        if (res.ok) {
+          alert('Personnel deleted successfully');
+          loadServingPersonnel();
+        } else {
+          alert(result.error || 'Failed to delete');
+        }
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    // Form functions - Retired Personnel
+    function showAddRetiredForm() {
+      document.getElementById('retiredFormTitle').textContent = 'Add Retired Personnel';
+      document.getElementById('retiredForm').reset();
+      document.getElementById('retiredServiceID').disabled = false;
+      document.getElementById('retiredFormId').value = '';
+      document.getElementById('retiredFormError').classList.add('hidden');
+      document.getElementById('retiredFormModal').classList.remove('hidden');
+    }
+
+    function editRetiredPersonnel(id) {
+      apiCall(`/api/personnel/retired/${id}`).then(res => {
+        if (!res) return;
+        res.json().then(result => {
+          const p = result.personnel;
+          document.getElementById('retiredFormTitle').textContent = 'Edit Retired Personnel';
+          document.getElementById('retiredFormId').value = p.serviceID;
+          document.getElementById('retiredServiceID').value = p.serviceID;
+          document.getElementById('retiredServiceID').disabled = true;
+          document.getElementById('retiredFirstName').value = p.firstName;
+          document.getElementById('retiredLastName').value = p.lastName;
+          document.getElementById('retiredDOB').value = p.DOB;
+          document.getElementById('retiredRank').value = p.lastRank;
+          document.getElementById('retiredRetirementDate').value = p.retirementDate;
+          document.getElementById('retiredRegiment').value = p.regiment || '';
+          document.getElementById('retiredPension').value = p.pension;
+          document.getElementById('retiredAwards').value = p.awards || '';
+          document.getElementById('retiredSkills').value = p.skills || '';
+          document.getElementById('retiredHealthPlan').value = p.healthPlan || '';
+          document.getElementById('retiredFormError').classList.add('hidden');
+          document.getElementById('retiredFormModal').classList.remove('hidden');
+        });
+      });
+    }
+
+    function closeRetiredForm() {
+      document.getElementById('retiredFormModal').classList.add('hidden');
+    }
+
+    async function deleteRetiredPersonnel(id) {
+      if (!confirm(`Are you sure you want to delete retired personnel ${id}?`)) return;
+      try {
+        const res = await apiCall(`/api/personnel/retired/${id}`, { method: 'DELETE' });
+        if (!res) return;
+        const result = await res.json();
+        if (res.ok) {
+          alert('Personnel deleted successfully');
+          loadRetiredPersonnel();
+        } else {
+          alert(result.error || 'Failed to delete');
+        }
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    // Form functions - Logistics
+    function showAddLogisticsForm() {
+      document.getElementById('logisticsFormTitle').textContent = 'Add Equipment';
+      document.getElementById('logisticsForm').reset();
+      document.getElementById('logisticsEquipmentID').disabled = false;
+      document.getElementById('logisticsFormId').value = '';
+      document.getElementById('logisticsFormError').classList.add('hidden');
+      document.getElementById('logisticsFormModal').classList.remove('hidden');
+    }
+
+    function editLogistics(id) {
+      apiCall(`/api/logistics/${id}`).then(res => {
+        if (!res) return;
+        res.json().then(result => {
+          const e = result.equipment;
+          document.getElementById('logisticsFormTitle').textContent = 'Edit Equipment';
+          document.getElementById('logisticsFormId').value = e.equipmentID;
+          document.getElementById('logisticsEquipmentID').value = e.equipmentID;
+          document.getElementById('logisticsEquipmentID').disabled = true;
+          document.getElementById('logisticsType').value = e.logisticsType;
+          document.getElementById('logisticsCost').value = e.cost;
+          document.getElementById('logisticsProcurementDate').value = e.procurementDate;
+          document.getElementById('logisticsLocation').value = e.location;
+          document.getElementById('logisticsAssignedTo').value = e.assignedTo || '';
+          document.getElementById('logisticsTech').value = e.tech || '';
+          document.getElementById('logisticsFormError').classList.add('hidden');
+          document.getElementById('logisticsFormModal').classList.remove('hidden');
+        });
+      });
+    }
+
+    function closeLogisticsForm() {
+      document.getElementById('logisticsFormModal').classList.add('hidden');
+    }
+
+    async function deleteLogistics(id) {
+      if (!confirm(`Are you sure you want to delete equipment ${id}?`)) return;
+      try {
+        const res = await apiCall(`/api/logistics/${id}`, { method: 'DELETE' });
+        if (!res) return;
+        const result = await res.json();
+        if (res.ok) {
+          alert('Equipment deleted successfully');
+          loadLogistics();
+        } else {
+          alert(result.error || 'Failed to delete');
+        }
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    // Form functions - Artillery
+    function showAddArtilleryForm() {
+      document.getElementById('artilleryFormTitle').textContent = 'Add Artillery';
+      document.getElementById('artilleryForm').reset();
+      document.getElementById('artilleryEquipmentID').disabled = false;
+      document.getElementById('artilleryFormId').value = '';
+      document.getElementById('artilleryFormError').classList.add('hidden');
+      document.getElementById('artilleryFormModal').classList.remove('hidden');
+    }
+
+    function editArtillery(id) {
+      // Need to get artillery data - we'll need to find it from the list or create a GET endpoint
+      // For now, we'll fetch from the artillery list
+      apiCall('/api/artillery').then(res => {
+        if (!res) return;
+        res.json().then(result => {
+          const a = result.artillery.find(item => item.equipmentID === id);
+          if (!a) {
+            alert('Artillery not found');
+            return;
+          }
+          document.getElementById('artilleryFormTitle').textContent = 'Edit Artillery';
+          document.getElementById('artilleryFormId').value = a.equipmentID;
+          document.getElementById('artilleryEquipmentID').value = a.equipmentID;
+          document.getElementById('artilleryEquipmentID').disabled = true;
+          document.getElementById('artilleryType').value = a.type;
+          document.getElementById('artilleryRange').value = a.artRange;
+          document.getElementById('artilleryCommissioningDate').value = a.commissioningDate;
+          document.getElementById('artilleryFormError').classList.add('hidden');
+          document.getElementById('artilleryFormModal').classList.remove('hidden');
+        });
+      });
+    }
+
+    function closeArtilleryForm() {
+      document.getElementById('artilleryFormModal').classList.add('hidden');
+    }
+
+    async function deleteArtillery(id) {
+      if (!confirm(`Are you sure you want to delete artillery ${id}?`)) return;
+      try {
+        const res = await apiCall(`/api/artillery/${id}`, { method: 'DELETE' });
+        if (!res) return;
+        const result = await res.json();
+        if (res.ok) {
+          alert('Artillery deleted successfully');
+          loadArtillery();
+        } else {
+          alert(result.error || 'Failed to delete');
+        }
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    // Form functions - Ships
+    function showAddShipForm() {
+      document.getElementById('shipsFormTitle').textContent = 'Add Ship';
+      document.getElementById('shipsForm').reset();
+      document.getElementById('shipsEquipmentID').disabled = false;
+      document.getElementById('shipsFormId').value = '';
+      document.getElementById('shipsFormError').classList.add('hidden');
+      document.getElementById('shipsFormModal').classList.remove('hidden');
+    }
+
+    function editShip(id) {
+      apiCall('/api/ships').then(res => {
+        if (!res) return;
+        res.json().then(result => {
+          const s = result.ships.find(item => item.equipmentID === id);
+          if (!s) {
+            alert('Ship not found');
+            return;
+          }
+          document.getElementById('shipsFormTitle').textContent = 'Edit Ship';
+          document.getElementById('shipsFormId').value = s.equipmentID;
+          document.getElementById('shipsEquipmentID').value = s.equipmentID;
+          document.getElementById('shipsEquipmentID').disabled = true;
+          document.getElementById('shipsName').value = s.shipName;
+          document.getElementById('shipsType').value = s.shipType;
+          document.getElementById('shipsStaffSize').value = s.staffSize;
+          document.getElementById('shipsCommissioningDate').value = s.commissioningDate;
+          document.getElementById('shipsFormError').classList.add('hidden');
+          document.getElementById('shipsFormModal').classList.remove('hidden');
+        });
+      });
+    }
+
+    function closeShipsForm() {
+      document.getElementById('shipsFormModal').classList.add('hidden');
+    }
+
+    async function deleteShip(id) {
+      if (!confirm(`Are you sure you want to delete ship ${id}?`)) return;
+      try {
+        const res = await apiCall(`/api/ships/${id}`, { method: 'DELETE' });
+        if (!res) return;
+        const result = await res.json();
+        if (res.ok) {
+          alert('Ship deleted successfully');
+          loadShips();
+        } else {
+          alert(result.error || 'Failed to delete');
+        }
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    // Form functions - Jets
+    function showAddJetForm() {
+      document.getElementById('jetsFormTitle').textContent = 'Add Jet';
+      document.getElementById('jetsForm').reset();
+      document.getElementById('jetsEquipmentID').disabled = false;
+      document.getElementById('jetsFormId').value = '';
+      document.getElementById('jetsFormError').classList.add('hidden');
+      document.getElementById('jetsFormModal').classList.remove('hidden');
+    }
+
+    function editJet(id) {
+      apiCall('/api/jets').then(res => {
+        if (!res) return;
+        res.json().then(result => {
+          const j = result.jets.find(item => item.equipmentID === id);
+          if (!j) {
+            alert('Jet not found');
+            return;
+          }
+          document.getElementById('jetsFormTitle').textContent = 'Edit Jet';
+          document.getElementById('jetsFormId').value = j.equipmentID;
+          document.getElementById('jetsEquipmentID').value = j.equipmentID;
+          document.getElementById('jetsEquipmentID').disabled = true;
+          document.getElementById('jetsName').value = j.jetName;
+          document.getElementById('jetsType').value = j.jetType;
+          document.getElementById('jetsSpeed').value = j.speed;
+          document.getElementById('jetsCommissioningDate').value = j.commissioningDate;
+          document.getElementById('jetsFormError').classList.add('hidden');
+          document.getElementById('jetsFormModal').classList.remove('hidden');
+        });
+      });
+    }
+
+    function closeJetsForm() {
+      document.getElementById('jetsFormModal').classList.add('hidden');
+    }
+
+    async function deleteJet(id) {
+      if (!confirm(`Are you sure you want to delete jet ${id}?`)) return;
+      try {
+        const res = await apiCall(`/api/jets/${id}`, { method: 'DELETE' });
+        if (!res) return;
+        const result = await res.json();
+        if (res.ok) {
+          alert('Jet deleted successfully');
+          loadJets();
+        } else {
+          alert(result.error || 'Failed to delete');
+        }
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    // Delete User
+    async function deleteUser(userId) {
+      if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
+      try {
+        const res = await apiCall(`/api/users/${userId}`, { method: 'DELETE' });
+        if (!res) return;
+        const result = await res.json();
+        if (res.ok) {
+          alert('User deleted successfully');
+          loadUsers();
+        } else {
+          alert(result.error || 'Failed to delete user');
+        }
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    // Load Users (Admin Only)
+    async function loadUsers() {
+      if (userRole !== 'admin') {
+        navigateTo('dashboard');
+        return;
+      }
+
+      const listEl = document.getElementById('usersList');
+      listEl.innerHTML = '<div class="loading">Loading users...</div>';
+      
+      try {
+        const res = await apiCall('/api/users');
+        if (!res) return;
+        
+        const result = await res.json();
+
+        if (!result.users || result.users.length === 0) {
+          listEl.innerHTML = '<div class="alert alert-info">No users found.</div>';
+          return;
+        }
+
+        listEl.innerHTML = `
+          <div style="overflow-x:auto;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>User ID</th>
+                  <th>Username</th>
+                  <th>Role</th>
+                  <th>Created At</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${result.users.map(u => `
+                  <tr>
+                    <td>${u.userID}</td>
+                    <td><strong>${escapeHTML(u.username)}</strong></td>
+                    <td>
+                      <span class="role-badge ${u.role}">${u.role}</span>
+                    </td>
+                    <td>${new Date(u.createdAt).toLocaleDateString()}</td>
+                    <td>
+                      <div class="action-buttons">
+                        ${u.role === 'admin' 
+                          ? `<button class="btn btn-secondary" onclick="updateUserRole(${u.userID}, 'user')" style="padding: 0.5rem 1rem; font-size: 0.75rem;">Make User</button>`
+                          : `<button class="btn btn-primary" onclick="updateUserRole(${u.userID}, 'admin')" style="padding: 0.5rem 1rem; font-size: 0.75rem;">Make Admin</button>`
+                        }
+                        <button class="btn btn-danger" onclick="deleteUser(${u.userID})" style="padding: 0.5rem 1rem; font-size: 0.75rem;">Delete</button>
+                      </div>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      } catch (err) {
+        listEl.innerHTML = '<div class="alert alert-error">Failed to load users.</div>';
+      }
+    }
+
+    // Update User Role
+    async function updateUserRole(userId, newRole) {
+      if (!confirm(`Are you sure you want to change this user's role to ${newRole}?`)) {
+        return;
+      }
+
+      try {
+        const res = await apiCall(`/api/users/${userId}/role`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ role: newRole })
+        });
+
+        if (!res) return;
+
+        const result = await res.json();
+
+        if (!res.ok) {
+          alert(result.error || 'Failed to update user role');
+          return;
+        }
+
+        alert('User role updated successfully!');
+        loadUsers(); // Refresh the list
+      } catch (err) {
+        alert('Error updating user role: ' + err.message);
+      }
+    }
+
+    // Form Submission Handlers
+    // Serving Personnel Form
+    document.getElementById('servingForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData);
+      const errorEl = document.getElementById('servingFormError');
+      errorEl.classList.add('hidden');
+
+      const isEdit = document.getElementById('servingFormId').value;
+      const url = isEdit ? `/api/personnel/serving/${isEdit}` : '/api/personnel/serving';
+      const method = isEdit ? 'PUT' : 'POST';
+
+      try {
+        const res = await apiCall(url, {
+          method: method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (!res) return;
+        const result = await res.json();
+        if (res.ok) {
+          closeServingForm();
+          loadServingPersonnel();
+        } else {
+          errorEl.textContent = result.error || 'Operation failed';
+          errorEl.classList.remove('hidden');
+        }
+      } catch (err) {
+        errorEl.textContent = 'Error: ' + err.message;
+        errorEl.classList.remove('hidden');
+      }
+    });
+
+    // Retired Personnel Form
+    document.getElementById('retiredForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData);
+      const errorEl = document.getElementById('retiredFormError');
+      errorEl.classList.add('hidden');
+
+      const isEdit = document.getElementById('retiredFormId').value;
+      const url = isEdit ? `/api/personnel/retired/${isEdit}` : '/api/personnel/retired';
+      const method = isEdit ? 'PUT' : 'POST';
+
+      try {
+        const res = await apiCall(url, {
+          method: method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (!res) return;
+        const result = await res.json();
+        if (res.ok) {
+          closeRetiredForm();
+          loadRetiredPersonnel();
+        } else {
+          errorEl.textContent = result.error || 'Operation failed';
+          errorEl.classList.remove('hidden');
+        }
+      } catch (err) {
+        errorEl.textContent = 'Error: ' + err.message;
+        errorEl.classList.remove('hidden');
+      }
+    });
+
+    // Logistics Form
+    document.getElementById('logisticsForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData);
+      const errorEl = document.getElementById('logisticsFormError');
+      errorEl.classList.add('hidden');
+
+      const isEdit = document.getElementById('logisticsFormId').value;
+      const url = isEdit ? `/api/logistics/${isEdit}` : '/api/logistics';
+      const method = isEdit ? 'PUT' : 'POST';
+
+      try {
+        const res = await apiCall(url, {
+          method: method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (!res) return;
+        const result = await res.json();
+        if (res.ok) {
+          closeLogisticsForm();
+          loadLogistics();
+        } else {
+          errorEl.textContent = result.error || 'Operation failed';
+          errorEl.classList.remove('hidden');
+        }
+      } catch (err) {
+        errorEl.textContent = 'Error: ' + err.message;
+        errorEl.classList.remove('hidden');
+      }
+    });
+
+    // Artillery Form
+    document.getElementById('artilleryForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData);
+      const errorEl = document.getElementById('artilleryFormError');
+      errorEl.classList.add('hidden');
+
+      const isEdit = document.getElementById('artilleryFormId').value;
+      const url = isEdit ? `/api/artillery/${isEdit}` : '/api/artillery';
+      const method = isEdit ? 'PUT' : 'POST';
+
+      try {
+        const res = await apiCall(url, {
+          method: method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (!res) return;
+        const result = await res.json();
+        if (res.ok) {
+          closeArtilleryForm();
+          loadArtillery();
+        } else {
+          errorEl.textContent = result.error || 'Operation failed';
+          errorEl.classList.remove('hidden');
+        }
+      } catch (err) {
+        errorEl.textContent = 'Error: ' + err.message;
+        errorEl.classList.remove('hidden');
+      }
+    });
+
+    // Ships Form
+    document.getElementById('shipsForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData);
+      const errorEl = document.getElementById('shipsFormError');
+      errorEl.classList.add('hidden');
+
+      const isEdit = document.getElementById('shipsFormId').value;
+      const url = isEdit ? `/api/ships/${isEdit}` : '/api/ships';
+      const method = isEdit ? 'PUT' : 'POST';
+
+      try {
+        const res = await apiCall(url, {
+          method: method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (!res) return;
+        const result = await res.json();
+        if (res.ok) {
+          closeShipsForm();
+          loadShips();
+        } else {
+          errorEl.textContent = result.error || 'Operation failed';
+          errorEl.classList.remove('hidden');
+        }
+      } catch (err) {
+        errorEl.textContent = 'Error: ' + err.message;
+        errorEl.classList.remove('hidden');
+      }
+    });
+
+    // Jets Form
+    document.getElementById('jetsForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData);
+      const errorEl = document.getElementById('jetsFormError');
+      errorEl.classList.add('hidden');
+
+      const isEdit = document.getElementById('jetsFormId').value;
+      const url = isEdit ? `/api/jets/${isEdit}` : '/api/jets';
+      const method = isEdit ? 'PUT' : 'POST';
+
+      try {
+        const res = await apiCall(url, {
+          method: method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (!res) return;
+        const result = await res.json();
+        if (res.ok) {
+          closeJetsForm();
+          loadJets();
+        } else {
+          errorEl.textContent = result.error || 'Operation failed';
+          errorEl.classList.remove('hidden');
+        }
+      } catch (err) {
+        errorEl.textContent = 'Error: ' + err.message;
+        errorEl.classList.remove('hidden');
+      }
+    });
+
+    // Helper functions
+    function escapeHTML(str) {
+      if (!str) return '';
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>
